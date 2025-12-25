@@ -1,1 +1,0 @@
-.\venv310\Scripts\Activate.ps1
