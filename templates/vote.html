@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Voting{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 max-w-4xl mx-auto card-hover">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Pilih Kandidat Favorit Anda</h2>
+        <p class="text-gray-600">Klik pada salah satu kandidat di bawah untuk memberikan suara Anda</p>
+        
+        <!-- Progress Indicator -->
+        <div class="mt-6 bg-gray-100 rounded-full h-3 w-full max-w-md mx-auto shadow-inner">
+            <div class="bg-gradient-to-r from-green-400 to-green-500 h-3 rounded-full transition-all duration-500" style="width: 60%"></div>
+        </div>
+        <p class="text-sm text-gray-500 mt-2">Langkah 2 dari 3: Memilih Kandidat</p>
+    </div>
+    
+    {% if kandidat_list %}
+        <form method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for kandidat in kandidat_list %}
+                <div class="relative">
+                    <input type="radio" name="id_kandidat" value="{{ kandidat['id'] }}" 
+                           id="kandidat{{ kandidat['id'] }}" required
+                           class="absolute opacity-0 h-0 w-0">
+                    <label for="kandidat{{ kandidat['id'] }}" 
+                           class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-300 hover:border-blue-400 hover:shadow-lg group h-full card-hover">
+                        <!-- Candidate Avatar -->
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            {{ kandidat['nama'][0]|upper }}
+                        </div>
+                        
+                        <!-- Candidate Name -->
+                        <h3 class="text-xl font-semibold text-gray-800 text-center mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                            {{ kandidat['nama'] }}
+                        </h3>
+                        
+                        <!-- Selection Indicator -->
+                        <div class="mt-2 flex items-center justify-center">
+                            <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center group-hover:border-blue-500 transition-colors duration-300">
+                                <div class="w-3 h-3 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </div>
+                            <span class="ml-2 text-sm text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
+                                Pilih kandidat
+                            </span>
+                        </div>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center">
+                    <i class="fas fa-paper-plane mr-3"></i>
+                    Kirim Vote Saya
+                </button>
+                <p class="text-center text-gray-500 text-sm mt-3">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    Setelah mengirim, Anda tidak dapat mengubah pilihan
+                </p>
+            </div>
+        </form>
+    {% else %}
+        <div class="text-center py-12">
+            <div class="bg-yellow-50 rounded-full p-4 inline-flex items-center justify-center mb-4">
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Kandidat</h3>
+            <p class="text-gray-600 max-w-md mx-auto">
+                Saat ini belum ada kandidat yang tersedia untuk dipilih. 
+                Silakan hubungi administrator untuk informasi lebih lanjut.
+            </p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add visual feedback when a candidate is selected
+    const radioInputs = document.querySelectorAll('input[type="radio"]');
+    
+    radioInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Reset all labels
+            document.querySelectorAll('label').forEach(label => {
+                label.classList.remove('border-blue-500', 'bg-blue-50', 'shadow-lg', 'ring-2', 'ring-blue-200');
+                label.classList.add('border-gray-200');
+                
+                // Reset selection indicator
+                const indicator = label.querySelector('.w-6');
+                if (indicator) {
+                    indicator.classList.remove('border-blue-500');
+                    indicator.classList.add('border-gray-300');
+                }
+                
+                const dot = label.querySelector('.bg-blue-500');
+                if (dot) {
+                    dot.classList.add('opacity-0');
+                }
+                
+                const text = label.querySelector('.text-sm');
+                if (text) {
+                    text.textContent = 'Pilih kandidat';
+                    text.classList.remove('text-blue-500', 'font-medium');
+                    text.classList.add('text-gray-500');
+                }
+                
+                // Reset avatar
+                const avatar = label.querySelector('.rounded-full');
+                if (avatar) {
+                    avatar.classList.remove('ring-4', 'ring-blue-200');
+                }
+            });
+            
+            // Highlight selected candidate
+            if (this.checked) {
+                const selectedLabel = document.querySelector(`label[for="${this.id}"]`);
+                if (selectedLabel) {
+                    selectedLabel.classList.remove('border-gray-200');
+                    selectedLabel.classList.add('border-blue-500', 'bg-blue-50', 'shadow-lg', 'ring-2', 'ring-blue-200');
+                    
+                    // Update selection indicator
+                    const indicator = selectedLabel.querySelector('.w-6');
+                    if (indicator) {
+                        indicator.classList.remove('border-gray-300');
+                        indicator.classList.add('border-blue-500');
+                    }
+                    
+                    const dot = selectedLabel.querySelector('.bg-blue-500');
+                    if (dot) {
+                        dot.classList.remove('opacity-0');
+                    }
+                    
+                    const text = selectedLabel.querySelector('.text-sm');
+                    if (text) {
+                        text.textContent = 'Dipilih';
+                        text.classList.remove('text-gray-500');
+                        text.classList.add('text-blue-500', 'font-medium');
+                    }
+                    
+                    // Highlight avatar
+                    const avatar = selectedLabel.querySelector('.rounded-full');
+                    if (avatar) {
+                        avatar.classList.add('ring-4', 'ring-blue-200');
+                    }
+                }
+            }
+        });
+    });
+});
+</script>
+
+<style>
+/* Custom styling for better visual feedback */
+input[type="radio"]:checked + label {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Animation for the avatar on hover */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.group:hover .group-hover\\:scale-110 {
+    animation: pulse 1.5s infinite;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-6xl mx-auto">
+    <!-- Header dengan gradient konsisten -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+            <div class="text-center md:text-left mb-4 md:mb-0">
+                <h1 class="text-2xl md:text-3xl font-bold text-white">Dashboard Admin</h1>
+                <p class="text-blue-100 mt-2">Selamat datang, <span class="font-semibold text-white">{{ session.admin }}</span>!</p>
+            </div>
+            <div class="flex justify-center md:justify-end">
+                <a href="{{ url_for('logout') }}" 
+                   class="inline-flex items-center justify-center py-3 px-6 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+<div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 card-hover">
+    <!-- Header yang sudah responsive -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 space-y-4 md:space-y-0">
+        <div class="text-center md:text-left">
+            
+        </div>
+        <!-- Tombol logout dipindah ke sini (hanya di dashboard) -->
+        <div class="text-center">
+            
+        </div>
+    </div>
+    
+    <!-- Stats Grid - Responsive (3 kolom) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 md:p-6 rounded-xl border border-blue-200 card-hover">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-lg mr-4 shadow-md">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-blue-600 font-medium">Total Kandidat</p>
+                        <p class="text-2xl md:text-3xl font-bold text-blue-700">
+                            {{ total_kandidat | default(0) }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 md:p-6 rounded-xl border border-green-200 card-hover">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-lg mr-4 shadow-md">
+                        <i class="fas fa-chart-bar text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-green-600 font-medium">Total Vote</p>
+                        <p class="text-2xl md:text-3xl font-bold text-green-700">{{ total_votes }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Sistem dipindah ke sini -->
+            <div class="bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-100 shadow-sm transition-all duration-300 hover:shadow-md hover:border-purple-300 hover:translate-y-[-2px]">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-4 rounded-xl mr-5 shadow-md">
+                        <i class="fas fa-cog text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-purple-600 mb-1">Status Sistem</p>
+                        <p class="text-2xl font-bold text-purple-800">Aktif</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+<!-- Menu Grid - Responsive -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+    <a href="{{ url_for('kelola_kandidat') }}" class="block p-4 md:p-6 bg-white border border-gray-200 rounded-xl hover:border-blue-500 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group card-hover">
+        <div class="flex items-center">
+            <div class="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-500 group-hover:to-blue-600 transition-all duration-300 shadow-sm">
+                <i class="fas fa-users text-blue-500 group-hover:text-white text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">Kelola Kandidat</h3>
+                <p class="text-gray-600 text-sm">Lihat dan hapus kandidat</p>
+            </div>
+        </div>
+    </a>
+
+    <a href="{{ url_for('hasil_blockchain') }}" class="block p-4 md:p-6 bg-white border border-gray-200 rounded-xl hover:border-green-500 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group card-hover">
+        <div class="flex items-center">
+            <div class="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-500 group-hover:to-green-600 transition-all duration-300 shadow-sm">
+                <i class="fas fa-link text-green-500 group-hover:text-white text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 group-hover:text-green-600 transition-colors duration-300">Lihat Hasil</h3>
+                <p class="text-gray-600 text-sm">Lihat hasil voting dengan sistem blockchain</p>
+            </div>
+        </div>
+    </a>
+{% endblock %}
