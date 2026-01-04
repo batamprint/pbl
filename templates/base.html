@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Voting - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .flash-message {
+            animation: slideInDown 0.5s ease-out;
+        }
+        
+        .flash-message.hiding {
+            animation: slideOutUp 0.5s ease-in;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes progress {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+            }
+        }
+        
+        .btn-primary {
+            @apply bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen">
+    <!-- Skip header dan footer untuk halaman login agar lebih clean -->
+    {% if not request.endpoint == 'login' %}
+    
+
+                <!-- User Info -->
+                <div class="flex items-center space-x-4">
+                    {% if session.get('admin') %}
+
+                    {% elif session.get('voter_allowed') %}
+                        <div class="hidden sm:flex items-center text-sm text-gray-500 bg-green-50 py-1 px-3 rounded-full">
+                            <i class="fas fa-user-graduate mr-2 text-green-500"></i>
+                            <span class="font-medium">Pemilih</span>
+                        </div>
+                    {% else %}
+                        
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden border-t border-gray-200 py-4 bg-white">
+                <nav class="flex flex-col space-y-3">
+                    {% if session.get('admin') %}
+                        <a href="{{ url_for('admin_dashboard') }}" 
+                           class="flex items-center text-gray-600 hover:text-blue-600 py-2 px-3 rounded-lg transition-all duration-300 {% if request.endpoint == 'admin_dashboard' %}bg-blue-50 text-blue-600 font-semibold{% endif %}">
+                            <i class="fas fa-tachometer-alt mr-3 w-5 text-center"></i>
+                            Dashboard
+                        </a>
+                        <a href="{{ url_for('kelola_kandidat') }}" 
+                           class="flex items-center text-gray-600 hover:text-blue-600 py-2 px-3 rounded-lg transition-all duration-300 {% if request.endpoint == 'kelola_kandidat' %}bg-blue-50 text-blue-600 font-semibold{% endif %}">
+                            <i class="fas fa-users mr-3 w-5 text-center"></i>
+                            Kelola Kandidat
+                        </a>
+                        <a href="{{ url_for('hasil') }}" 
+                           class="flex items-center text-gray-600 hover:text-blue-600 py-2 px-3 rounded-lg transition-all duration-300 {% if request.endpoint == 'hasil' %}bg-blue-50 text-blue-600 font-semibold{% endif %}">
+                            <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
+                            Hasil Voting
+                        </a>
+                        <!-- Mobile Logout Button -->
+                        <a href="{{ url_for('logout') }}" class="flex items-center text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-3 rounded-lg mt-4 transition-all duration-300">
+                            <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i>
+                            Logout
+                        </a>
+                    {% elif session.get('voter_allowed') %}
+                        <a href="{{ url_for('vote') }}" 
+                           class="flex items-center text-gray-600 hover:text-green-600 py-2 px-3 rounded-lg transition-all duration-300 {% if request.endpoint == 'vote' %}bg-green-50 text-green-600 font-semibold{% endif %}">
+                            <i class="fas fa-vote-yea mr-3 w-5 text-center"></i>
+                            Voting
+                        </a>
+                        <!-- Mobile Logout Button -->
+                        <a href="{{ url_for('logout') }}" class="flex items-center text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-3 rounded-lg mt-4 transition-all duration-300">
+                            <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i>
+                            Logout
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="{% if request.endpoint == 'login' %}flex-1 flex items-center justify-center{% else %}max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8{% endif %}">
+        <!-- Modern Flash Messages -->
+        <div id="flash-container" class="fixed top-4 right-4 z-50 space-y-3 max-w-sm w-full"></div>
+        
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% if not request.endpoint == 'login' %}
+
+    {% endif %}
+
+    <script>
+        // Function to show modern flash messages
+        function showFlashMessage(message, type = 'info') {
+            const container = document.getElementById('flash-container');
+            if (!container) return;
+            
+            const messageId = 'flash-' + Date.now();
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+            
+            const colors = {
+                success: 'bg-green-50 border-green-500 text-green-700',
+                error: 'bg-red-50 border-red-500 text-red-700',
+                warning: 'bg-yellow-50 border-yellow-500 text-yellow-700',
+                info: 'bg-blue-50 border-blue-500 text-blue-700'
+            };
+            
+            const iconColors = {
+                success: 'text-green-500',
+                error: 'text-red-500',
+                warning: 'text-yellow-500',
+                info: 'text-blue-500'
+            };
+            
+            const flashHTML = `
+                <div id="${messageId}" class="flash-message ${colors[type]} border-l-4 rounded-lg shadow-lg transform transition-all duration-500">
+                    <div class="p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="${icons[type]} ${iconColors[type]} text-lg mt-0.5"></i>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <p class="text-sm font-medium">${message}</p>
+                            </div>
+                            <button onclick="closeFlashMessage('${messageId}')" class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2">
+                            <div class="h-1 bg-current opacity-20 rounded-full">
+                                <div class="h-full bg-current rounded-full progress-bar" style="animation: progress 5s linear forwards;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', flashHTML);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                closeFlashMessage(messageId);
+            }, 5000);
+        }
+        
+        // Function to close flash message
+        function closeFlashMessage(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.add('hiding');
+                setTimeout(() => {
+                    if (element.parentElement) {
+                        element.parentElement.removeChild(element);
+                    }
+                }, 500);
+            }
+        }
+        
+        // Process existing flash messages from Flask
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're not on login page
+            if (!window.location.pathname.includes('login')) {
+                // Simulate flash messages (in real implementation, this would come from Flask)
+                // This is just for demonstration
+                const urlParams = new URLSearchParams(window.location.search);
+                const success = urlParams.get('success');
+                const error = urlParams.get('error');
+                
+                if (success) {
+                    showFlashMessage(decodeURIComponent(success), 'success');
+                }
+                if (error) {
+                    showFlashMessage(decodeURIComponent(error), 'error');
+                }
+            }
+            
+            // Add progress animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes progress {
+                    0% { width: 100%; }
+                    100% { width: 0%; }
+                }
+                .progress-bar {
+                    animation: progress 5s linear forwards;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // Tailwind config
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#6b7280',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+    // Process flash messages from Flask
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if we have flash messages from context processor
+        {% if flash_messages %}
+            {% for message in flash_messages %}
+                showFlashMessage("{{ message.message }}", "{{ message.category }}");
+            {% endfor %}
+        {% endif %}
+        
+        // Check URL parameters for success/error messages
+        const urlParams = new URLSearchParams(window.location.search);
+        const successParam = urlParams.get('success');
+        const errorParam = urlParams.get('error');
+        const warningParam = urlParams.get('warning');
+        
+        if (successParam) {
+            showFlashMessage(decodeURIComponent(successParam), 'success');
+        }
+        if (errorParam) {
+            showFlashMessage(decodeURIComponent(errorParam), 'error');
+        }
+        if (warningParam) {
+            showFlashMessage(decodeURIComponent(warningParam), 'warning');
+        }
+    });
+</script>
+</body>
+</html>
